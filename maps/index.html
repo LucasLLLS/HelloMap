@@ -4,6 +4,13 @@
   <meta charset="UTF-8">
   <title>Document</title>
 </head>
+
+<style>
+  #map {
+        width: 400px;
+        height: 400px;
+      }
+</style>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <body>
 
@@ -25,19 +32,30 @@
   <div id="result-box"><ul></ul></div>
 
 
+  <div id="map"></div>
+
+
   <script src="jquery.js"></script>
   <script>
+
+    
+
     $(document).ready(function(){
+
+        
+
 
       $("#raio").on("click mousemove", function(){
         $("span#raio_val").text($(this).val());
       });
 
       var places = ["Rua Eliane Araújo Neves"
-                    ,"Avenida Pafdgdfgdfulista"
+                    ,"Avenida Paulista"
                     ,"Rua Yago"
                     ,"Rua Brandino Francisco Genovesi"
                     ];
+
+/**/
 
 
       /*FUNÇÃO PARA PEGAR LOCAL ATUAL*/
@@ -76,7 +94,7 @@
         if(i==0){
           destString = destString + places[i];
         }else{
-          destString = destString + "|"+places[i];
+          destString = destString +"|"+places[i];
         }
       }
 
@@ -86,13 +104,15 @@
       $.get("https://lucaslellis.com/testes/maps/recebe.php?destinos="+destString+"&origem="+origem, function(data){
 
         var result = $.parseJSON(data);
-
+        console.log(result);
 
         var results = result.rows["0"].elements;
 
-        console.log(results);
+        /*console.log(result);*/
 
         $("#result-box ul").html("");
+
+        var markers = [];
 
         for(i=0; i<results.length; i++){
 
@@ -101,10 +121,50 @@
             var raio = $("#raio").val() * 1000;
             if(distancia<raio){
               $("#result-box ul").append("<li>"+result.destination_addresses[i]+"</li>");
+              /*https://maps.googleapis.com/maps/api/geocode/json?address=Winnetka&key=YOUR_API_KEY*/
+              $.get("https://maps.googleapis.com/maps/api/geocode/json?address="+result.destination_addresses[i]+"&key=AIzaSyBtClF2NyqzWzSHSMH1Ifk459K5k6kycQw", function(data){
+                  coords = data;
+                  
+                  markers.push([coords.results["0"].formatted_address, coords.results["0"].geometry.location.lat, coords.results["0"].geometry.location.lng]);
+                });
             }
 
           }
         }
+
+        function initMap() {
+
+        var locations = markers;
+
+        console.log(locations);
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 10,
+          center: new google.maps.LatLng(-33.92, 151.25),
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+
+        var infowindow = new google.maps.InfoWindow();
+
+        var marker, i;
+
+        for (i = 0; i < locations.length; i++) {  
+          marker = new google.maps.Marker({
+            position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+            map: map
+          });
+
+          google.maps.event.addListener(marker, 'click', (function(marker, i) {
+            return function() {
+              infowindow.setContent(locations[i][0]);
+              infowindow.open(map, marker);
+            }
+          })(marker, i));
+        }
+
+      }
+
+      initMap();
 
         /*var status = result.rows["0"].elements["0"].status;
         var result_box = $("#result-box h1");
@@ -123,5 +183,8 @@
       
     });
   </script>
+
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtClF2NyqzWzSHSMH1Ifk459K5k6kycQw"></script>
+
 </body>
 </html>

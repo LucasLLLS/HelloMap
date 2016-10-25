@@ -66,19 +66,19 @@
     }
 
     /*FUNÇÃO DE CÁLCULO DE DISTÂNCIA*/
-    $("#calc").click(function(){ 
+    $("#calc").click(function(){
 
       var destString = "";
+      var origem = $("form").serialize().replace(/%20/g,'%2B');
 
-      for(i=0; i<places.length; i++){
-        
-        var origem = $("form").serialize().replace(/%20/g,'%2B');
+      for(i=0; i<places.length; i++){     
 
         if(i==0){
           destString = destString + places[i];
         }else{
           destString = destString + "|" +places[i];
         }
+        
       }
 
       destString = destString.replace(/ /g,'%2B');

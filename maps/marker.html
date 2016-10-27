@@ -51,17 +51,19 @@
 
 		    //Pega locais cadastrados próximos
 		    var i = 0;
-	        for(i=0;i<places.length;i++){
-	        	var lt = places[i][1];
-	        	var ln = places[i][2];
-	        	var myLatLng = {lat: lt, lng: ln};
-	        	var marker = new google.maps.Marker({
+	      for(i=0;i<places.length;i++){
+	      	var lt = places[i][1];
+	      	var ln = places[i][2];
+	      	var myLatLng = {lat: lt, lng: ln};
+	      	var marker = new google.maps.Marker({
 			      position: myLatLng,
 			      map: map,
 			      title: places[i][0]
-			    });
-	        }
+		    	});
+	      }
 		}
+
+		
 
 		$(document).ready(function(){
 			if (navigator.geolocation) {
